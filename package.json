@@ -4,16 +4,19 @@
   "description": "",
   "main": "gulpfile.js",
   "scripts": {
-    "dev": "gulp dev && rm -f gulpfile.min.js",
-    "build": "gulp build && rm -f gulpfile.min.js"
+    "dev": "gulp dev",
+    "build": "gulp build"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^5.0.0",
     "gulp-copy": "^1.1.0",
     "gulp-csso": "^3.0.1",
+    "gulp-file": "^0.4.0",
+    "gulp-git": "^2.7.0",
     "gulp-iconv": "0.0.1",
     "gulp-plumber": "^1.2.0",
     "gulp-postcss": "^7.0.1",
@@ -21,7 +24,9 @@
     "gulp-sass": "^4.0.1",
     "gulp-uglify": "^3.0.0",
     "gulp-zip": "^4.1.0",
+    "moment": "^2.22.2",
     "node-normalize-scss": "^8.0.0",
+    "os": "^0.1.1",
     "run-sequence": "^2.2.1"
   }
 }

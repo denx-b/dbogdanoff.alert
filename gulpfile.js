@@ -8,8 +8,14 @@ const uglify = require("gulp-uglify");
 const rename = require("gulp-rename");
 const run = require("run-sequence");
 const copy = require("gulp-copy");
+const del = require("del");
 const zip = require("gulp-zip");
 const iconv = require("gulp-iconv");
+
+const git = require("gulp-git");
+const file = require("gulp-file");
+const moment = require("moment");
+const os = require("os");
 
 gulp.task("style", function () {
   gulp.src("source/alert.scss")
@@ -40,8 +46,15 @@ gulp.task("copyToBitrix", function () {
     .pipe(gulp.dest("../../../bitrix/js/dbogdanoff_alert"))
 });
 
+gulp.task("clean", function() {
+  return del([".last_version", ".last_version.zip", "install/js", "../../../bitrix/js/dbogdanoff_alert", "gulpfile.min.js"], {
+    force: true
+  });
+});
+
 gulp.task("dev", function(done) {
   run(
+    "clean",
     "style",
     "scripts",
     "copyToBitrix",
@@ -58,6 +71,37 @@ gulp.task("watch", function() {
  * Подготовка к публикации
  * Копирование последней версии и создание архива
  */
+gulp.task("getLastVersion", function () {
+  git.exec({args: 'log --tags --simplify-by-decoration --pretty="format:%cI %d"'}, function(error, output) {
+    var versions = output.trim().split(os.EOL);
+    if (typeof versions === "object")
+      versions = versions[0];
+
+    var last = "";
+    if (versions.length < 1) {
+      last = moment().format() + "  (tag: 0.0.1)";
+    }
+    else {
+      last = versions;
+    }
+
+    const pattern = /(.*)\s\s\((.*)tag:\s(.*)\)/gi;
+    const match = pattern.exec(last);
+
+    const lastVersionDate = moment(match[1]).format("YYYY-MM-DD HH:mm:ss");
+    const lastVersion = match[3];
+
+    const fileContents = "<?\n" +
+      "$arModuleVersion = array(\n" +
+      "    'VERSION' => '" + lastVersion + "',\n" +
+      "    'VERSION_DATE' => '" + lastVersionDate + "',\n" +
+      ");\n";
+
+    return file("version.php", fileContents)
+      .pipe(gulp.dest("install"));
+  });
+});
+
 gulp.task("copyLastVersion", function () {
   return gulp.src(["install/**/*", "lang/**/*", "include.php"], {
     base: "./.last_version"
@@ -67,7 +111,7 @@ gulp.task("copyLastVersion", function () {
 
 gulp.task("encodeFiles", function () {
   return gulp.src(".last_version/**/*")
-    .pipe(iconv({encoding: 'cp1251'}))
+    .pipe(iconv({encoding: "cp1251"}))
     .pipe(gulp.dest(".last_version"))
 });
 
@@ -80,6 +124,7 @@ gulp.task("createArchive", function () {
 gulp.task("build", function(done) {
   run(
     "dev",
+    "getLastVersion",
     "copyLastVersion",
     "encodeFiles",
     "createArchive",
