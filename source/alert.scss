@@ -1,0 +1,64 @@
+@keyframes alert-show {
+  0% {
+    opacity: 0;
+    transform: translate(13%, 0%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0%, 0%);
+  }
+}
+
+.dbogdanoff-alert {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.dbogdanoff-alert__item {
+  padding: 10px;
+  margin-top: 10px;
+  min-width: 275px;
+  border-radius: .25rem;
+  color: #004085;
+  background-color: #cce5ff;
+  border: 1px solid #b8daff;
+  opacity: 0;
+  transition: opacity .25s ease-out;
+
+  &--show {
+    opacity: 1;
+    animation-name: alert-show;
+    animation-duration: .25s;
+    animation-timing-function: cubic-bezier(0.25, 0.51, 0.13, 1.35);
+  }
+
+  &--success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+  }
+
+  &--error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+  }
+
+  &--warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+  }
+}
+
+@media (max-width: 360px) {
+  .dbogdanoff-alert {
+    width: 100%;
+  }
+}
